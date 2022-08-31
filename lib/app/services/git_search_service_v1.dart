@@ -10,9 +10,7 @@ class GitSearchServiceV1 implements GitSearchService {
     required Dio dio,
   }) {
     _dio = dio;
-
     _dio.options.baseUrl = GitSearchService.baseUrl;
-
     _dio.interceptors.add(LogInterceptor());
   }
 
@@ -23,12 +21,26 @@ class GitSearchServiceV1 implements GitSearchService {
       final data = response.data;
       return UserModel.fromJsonList(data);
     } catch (e) {
-      //errorHandler
-      //format
-      //socket
-      //response
       debugPrint(e.toString());
       return [];
+    }
+  }
+
+  @override
+  Future<UserModel?> findUserByUsername({
+    required String username,
+  }) async {
+    try {
+      final path = GitSearchService.findUserByLogin.replaceAll(
+        ":username:",
+        username,
+      );
+      final response = await _dio.get(path);
+      final data = response.data;
+      return UserModel.fromJson(data);
+    } catch (e) {
+      debugPrint(e.toString());
+      return null;
     }
   }
 }

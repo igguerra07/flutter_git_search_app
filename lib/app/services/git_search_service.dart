@@ -6,4 +6,7 @@ abstract class GitSearchService {
   static const findUserByLogin = "users/:username:";
 
   Future<List<UserModel>> getUsers();
+  Future<UserModel?> findUserByUsername({
+    required String username,
+  });
 }

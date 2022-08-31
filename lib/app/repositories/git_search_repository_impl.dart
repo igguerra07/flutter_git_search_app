@@ -22,4 +22,16 @@ class GitSearchRepositoryImpl implements GitHubSearchRepository {
       return left(Failure());
     }
   }
+
+  @override
+  Future<Either<Failure, UserModel?>> findUserByUsername({
+    required String username,
+  }) async {
+    try {
+      final user = await _remote.getUserByUsername(username: username);
+      return right(user);
+    } catch (e) {
+      return left(Failure());
+    }
+  }
 }

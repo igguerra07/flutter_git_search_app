@@ -13,8 +13,15 @@ class UserItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        side: BorderSide.none,
+        borderRadius: BorderRadius.circular(4),
+      ),
       child: Container(
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+        ),
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
@@ -37,30 +44,86 @@ class UserItem extends StatelessWidget {
                   Text(
                     user.login,
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    user.location ?? "No location",
-                    style: const TextStyle(
-                      fontSize: 12,
-                    ),
+                  Row(
+                    children: [
+                       const Icon(
+                        Icons.pin_drop_rounded,
+                        size: 18,
+                        color: Colors.blueAccent//Color(0xFFAEAEAE),
+                      ),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          user.location ?? "No location",
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFFAEAEAE),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    user.bio ?? "No bio",
-                    style: const TextStyle(
-                      fontSize: 12,
-                    ),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.message,
+                        size: 18,
+                        color: Colors.blueAccent,
+                      ),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          user.bio ?? "No bio",
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFFAEAEAE),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      Text(user.followers.toString()),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.people,
+                            size: 18,
+                            color: Color(0xFFAEAEAE),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            user.followers.toString(),
+                            style: const TextStyle(
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
                       const SizedBox(width: 16),
-                      Text(user.publicRepos.toString()),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.book,
+                            size: 18,
+                            color: Color(0xFFAEAEAE),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            user.publicRepos.toString(),
+                            style: const TextStyle(
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   )
                 ],

@@ -10,6 +10,7 @@ import 'package:git_app/app/repositories/git_search_repository.dart';
 import 'package:git_app/app/repositories/git_search_repository_impl.dart';
 import 'package:git_app/app/services/git_search_service.dart';
 import 'package:git_app/app/services/git_search_service_v1.dart';
+import 'package:git_app/app/usecases/find_user_by_username.dart';
 import 'package:git_app/app/usecases/get_users.dart';
 
 class HomePage extends StatefulWidget {
@@ -25,6 +26,7 @@ class _HomePageState extends State<HomePage> {
   late GitSearchRemoteDataSource _remote;
   late GitHubSearchRepository _repository;
   late GetUsersUseCase _getUsers;
+  late FindUserByUsernameUseCase _findUserByUsername;
   late HomeCubit _cubit;
 
   @override
@@ -35,7 +37,11 @@ class _HomePageState extends State<HomePage> {
     _remote = GitSearchRemoteDataSourceImpl(apiService: _apiService);
     _repository = GitSearchRepositoryImpl(remote: _remote);
     _getUsers = GetUsersUseCase(repository: _repository);
-    _cubit = HomeCubit(getUsers: _getUsers);
+    _findUserByUsername = FindUserByUsernameUseCase(repository: _repository);
+    _cubit = HomeCubit(
+      getUsers: _getUsers,
+      findUserByUsername: _findUserByUsername,
+    );
     super.initState();
 
     _cubit.getUsers();
@@ -50,67 +56,98 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFECE9EF),
       body: SafeArea(
-        child: BlocBuilder<HomeCubit, HomeState>(
-          bloc: _cubit,
-          builder: (_, state) {
-            if (state is HomeLoadingState) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-
-            if (state is HomeFailureState) {
-              return const Center(
-                child: Text("Something was wrong..."),
-              );
-            }
-
-            if (state is HomeLoadedState) {
-              return Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const Text(
-                          "Git Search",
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        TextField(
-                          decoration: InputDecoration(
-                            suffixIcon: const Icon(Icons.search_rounded),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            hintText: "Search user",
-                            filled: true,
-                            fillColor: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
+        child: Column(
+          children: [
+            Material(
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(8),
+              ),
+              elevation: 8,
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Color(0xFF0063E1),
+                  borderRadius: BorderRadius.vertical(
+                    bottom: Radius.circular(8),
                   ),
-                  Expanded(
-                    child: ListView.separated(
+                ),
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Text(
+                      "Git Search",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      onChanged: (value) => _cubit.findUserByUsername(
+                        username: value,
+                      ),
+                      decoration: InputDecoration(
+                        suffixIcon: const Icon(Icons.search_rounded),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        hintText: "Search user",
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Expanded(
+              child: BlocBuilder<HomeCubit, HomeState>(
+                bloc: _cubit,
+                builder: (_, state) {
+                  if (state is HomeLoadingState) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+
+                  if (state is HomeFailureState) {
+                    return const Center(
+                      child: Text("Something was wrong..."),
+                    );
+                  }
+
+                  if (state is HomeEmptyState) {
+                    return const Center(
+                      child: Text("No users found..."),
+                    );
+                  }
+
+                  if (state is HomeNotFoundUserState) {
+                    return Center(
+                      child: Text("${state.username} user not found..."),
+                    );
+                  }
+
+                  if (state is HomeLoadedState) {
+                    return ListView.separated(
                       shrinkWrap: true,
                       padding: const EdgeInsets.all(16),
                       itemCount: state.users.length,
-                      itemBuilder: (_, index) =>
-                          UserItem(user: state.users[index]),
+                      itemBuilder: (_, index) => UserItem(
+                        user: state.users[index],
+                      ),
                       separatorBuilder: (_, __) => const SizedBox(height: 16),
-                    ),
-                  ),
-                ],
-              );
-            }
-            return const SizedBox.shrink();
-          },
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
