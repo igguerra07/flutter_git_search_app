@@ -25,7 +25,7 @@ class HomeCubit extends Cubit<HomeState> {
     final eitherUsers = await _getUsers.call();
 
     eitherUsers.fold(
-      (failure) => emit(HomeFailureState()),
+      (failure) => emit(HomeFailureState(failure: failure)),
       (users) => users.isNotEmpty
           ? emit(HomeLoadedState(users: users))
           : emit(HomeEmptyState()),
@@ -46,12 +46,8 @@ class HomeCubit extends Cubit<HomeState> {
         );
 
         eitherUser.fold(
-          (failure) => emit(HomeFailureState()),
+          (failure) => emit(HomeFailureState(failure: failure)),
           (user) {
-            if (user == null) {
-              emit(HomeNotFoundUserState(username: username));
-              return;
-            }
             if (state is HomeLoadedState) {
               final newState = state as HomeLoadedState;
               emit(newState.copyWith(users: [user]));

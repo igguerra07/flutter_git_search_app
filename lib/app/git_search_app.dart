@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:git_app/app/features/home/home_page.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class GitSearchApp extends StatefulWidget {
   const GitSearchApp({Key? key}) : super(key: key);
@@ -14,6 +15,8 @@ class _GitSearchAppState extends State<GitSearchApp> {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: HomePage(),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
     );
   }
 }

@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:git_app/app/datasources/remote/git_search_remote_data.dart';
 import 'package:git_app/app/datasources/remote/git_search_remote_data_impl.dart';
+import 'package:git_app/app/errors/failures.dart';
 import 'package:git_app/app/features/home/cubit/home_cubit.dart';
 import 'package:git_app/app/features/home/cubit/home_state.dart';
+import 'package:git_app/app/features/home/errors/git_user_not_found.dart';
 import 'package:git_app/app/features/home/widgets/user_item.dart';
 import 'package:git_app/app/repositories/git_search_repository.dart';
 import 'package:git_app/app/repositories/git_search_repository_impl.dart';
@@ -12,6 +14,7 @@ import 'package:git_app/app/services/git_search_service.dart';
 import 'package:git_app/app/services/git_search_service_v1.dart';
 import 'package:git_app/app/usecases/find_user_by_username.dart';
 import 'package:git_app/app/usecases/get_users.dart';
+import 'package:git_app/app/extensions/extensions.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -76,9 +79,9 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Text(
-                      "Git Search",
-                      style: TextStyle(
+                    Text(
+                      context.l10n.globalAppName,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -95,7 +98,7 @@ class _HomePageState extends State<HomePage> {
                           borderSide: BorderSide.none,
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        hintText: "Search user",
+                        hintText: context.l10n.homeSearchUserHint,
                         filled: true,
                         fillColor: Colors.white,
                       ),
@@ -115,20 +118,24 @@ class _HomePageState extends State<HomePage> {
                   }
 
                   if (state is HomeFailureState) {
-                    return const Center(
-                      child: Text("Something was wrong..."),
-                    );
-                  }
-
-                  if (state is HomeEmptyState) {
-                    return const Center(
-                      child: Text("No users found..."),
-                    );
-                  }
-
-                  if (state is HomeNotFoundUserState) {
+                    final failure = state.failure;
+                    if (failure is GithubUserNotFound) {
+                      return Center(
+                        child: Text(context.l10n.homeGithubUserNotFound),
+                      );
+                    }
+                    if (state.failure is NotFoundFailure) {
+                      return Center(
+                        child: Text(context.l10n.globalResourceNotFound),
+                      );
+                    }
                     return Center(
-                      child: Text("${state.username} user not found..."),
+                      child: Text(context.l10n.globalResourceNotFound),
+                    );
+                  }
+                  if (state is HomeEmptyState) {
+                    return Center(
+                      child: Text(context.l10n.homeEmptyUserList),
                     );
                   }
 

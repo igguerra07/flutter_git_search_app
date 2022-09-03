@@ -1,0 +1,8 @@
+{
+    "globalAppName": "Git Search",
+    "globalResourceNotFound": "Resource not found",
+    "globalUnknownError": "Ops! Something went wrong...",
+    "homeEmptyUserList": "Not found users",
+    "homeGithubUserNotFound": "User not found",
+    "homeSearchUserHint": "Search user"
+}

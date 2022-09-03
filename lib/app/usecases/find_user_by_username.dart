@@ -12,7 +12,7 @@ class FindUserByUsernameUseCase {
     _repository = repository;
   }
 
-  Future<Either<Failure, UserModel?>> call({
+  Future<Either<Failure, UserModel>> call({
     required String username,
   }) {
     return _repository.findUserByUsername(username: username);

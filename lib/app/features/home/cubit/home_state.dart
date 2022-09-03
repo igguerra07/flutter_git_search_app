@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:git_app/app/errors/failures.dart';
 
 import 'package:git_app/app/models/user_model.dart';
 
@@ -12,18 +13,6 @@ class HomeInitialState extends HomeState {}
 class HomeLoadingState extends HomeState {}
 
 class HomeEmptyState extends HomeState {}
-
-class HomeNotFoundUserState extends HomeState {
-  final String username;
-
-  HomeNotFoundUserState({
-    required this.username,
-  });
-
-  @override
-  List<Object?> get props => [username];
-}
-
 class HomeLoadedState extends HomeState {
   final List<UserModel> users;
 
@@ -43,4 +32,13 @@ class HomeLoadedState extends HomeState {
   List<Object?> get props => [users];
 }
 
-class HomeFailureState extends HomeState {}
+class HomeFailureState extends HomeState {
+  final Failure failure;
+
+  HomeFailureState({
+    required this.failure,
+  });
+
+  @override
+  List<Object?> get props => [failure];
+}

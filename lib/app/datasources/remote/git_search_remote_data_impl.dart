@@ -12,12 +12,12 @@ class GitSearchRemoteDataSourceImpl implements GitSearchRemoteDataSource {
   }
 
   @override
-  Future<List<UserModel>> getUsers() {
-    return _apiService.getUsers();
+  Future<List<UserModel>> getUsers() async {
+    return await _apiService.getUsers();
   }
 
   @override
-  Future<UserModel?> getUserByUsername({
+  Future<UserModel> getUserByUsername({
     required String username,
   }) {
     return _apiService.findUserByUsername(username: username);
