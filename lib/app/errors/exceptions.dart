@@ -32,6 +32,18 @@ class NotFoundException implements Exception {
   @override
   String toString() => "NotFoundException:\nPath: $path\nMessage: $message";
 }
+class NoAuthorizedException implements Exception {
+  final String path;
+  final String message;
+
+  const NoAuthorizedException({
+    required this.path,
+    this.message = "No Authorized",
+  });
+
+  @override
+  String toString() => "NoAuthorizedException:\nPath: $path\nMessage: $message";
+}
 
 class ServerResponseException implements Exception {
   final String message;

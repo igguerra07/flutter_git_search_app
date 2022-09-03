@@ -9,34 +9,53 @@ class ErrorHandler {
     try {
       final response = await request();
       return response.data;
-    } on DioError catch (ex) {
-      switch (ex.type) {
+    } on DioError catch (dioError) {
+      switch (dioError.type) {
         case DioErrorType.sendTimeout:
         case DioErrorType.connectTimeout:
         case DioErrorType.receiveTimeout:
           throw const NoConnectionException();
         case DioErrorType.response:
-          final error = ApiResponseError.fromJson(ex.response?.data);
-          switch (ex.response?.statusCode) {
-            case 404:
-              throw NotFoundException(
-                path: "${ex.requestOptions.baseUrl}${ex.requestOptions.path}",
-                message: error.message,
-              );
-            default:
-              throw ServerResponseException(
-                statusCode: ex.response?.statusCode ?? -1,
-                message: error.message,
-              );
-          }
+          throw _throwExceptionByResponse(dioError.error);
         case DioErrorType.other:
-          if (ex.error is SocketException) {
-            throw const NoConnectionException();
-          }
-          rethrow;
+          throw _throwExceptionByError(dioError);
         default:
           rethrow;
       }
+    }
+  }
+
+  static _throwExceptionByError(DioError dioError) {
+    final error = dioError.error;
+    switch (error.runtimeType) {
+      case SocketException:
+        throw const NoConnectionException();
+      case TypeError:
+        throw const FormatException(); //model //stacktrace //message
+      default:
+        throw dioError.error;
+    }
+  }
+
+  static _throwExceptionByResponse(DioError dioError) {
+    final response = dioError.response;
+    final request = dioError.requestOptions;
+    final path = "${request.baseUrl}${request.path}";
+    final error = ApiResponseError.fromJson(response?.data);
+
+    switch (response?.statusCode) {
+      case 401:
+        throw NoAuthorizedException;
+      case 404:
+        throw NotFoundException(
+          path: path,
+          message: error.message,
+        );
+      default:
+        throw ServerResponseException(
+          statusCode: response?.statusCode ?? -1,
+          message: error.message,
+        );
     }
   }
 

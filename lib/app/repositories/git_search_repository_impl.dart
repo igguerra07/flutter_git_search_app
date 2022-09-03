@@ -21,8 +21,11 @@ class GitSearchRepositoryImpl implements GitHubSearchRepository {
       final users = await _remote.getUsers();
       return right(users);
     } catch (e) {
-      if(e is NotFoundException) {
-         return left(NotFoundFailure());
+      if (e is NotFoundException) {
+        return left(NotFoundFailure());
+      }
+      if (e is NoConnectionException) {
+        return left(NoConnectionFailure());
       }
       return left(Failure());
     }
@@ -38,6 +41,9 @@ class GitSearchRepositoryImpl implements GitHubSearchRepository {
     } catch (e) {
       if (e is NotFoundException) {
         return left(GithubUserNotFound(username: username));
+      }
+      if (e is NoConnectionException) {
+        return left(NoConnectionFailure());
       }
       return left(Failure());
     }

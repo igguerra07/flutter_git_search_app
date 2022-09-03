@@ -119,6 +119,11 @@ class _HomePageState extends State<HomePage> {
 
                   if (state is HomeFailureState) {
                     final failure = state.failure;
+                    if (failure is NoConnectionFailure) {
+                      return Center(
+                        child: Text(context.l10n.globalNoConnectionError),
+                      );
+                    }
                     if (failure is GithubUserNotFound) {
                       return Center(
                         child: Text(context.l10n.homeGithubUserNotFound),
