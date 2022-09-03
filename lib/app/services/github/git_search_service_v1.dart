@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:git_app/app/errors/error_handler.dart';
 import 'package:git_app/app/models/user_model.dart';
-import 'package:git_app/app/services/git_search_service.dart';
+import 'package:git_app/app/services/github/git_search_service.dart';
 
 class GitSearchServiceV1 implements GitSearchService {
   late final Dio _dio;

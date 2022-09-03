@@ -1,6 +1,6 @@
 import 'package:git_app/app/datasources/remote/git_search_remote_data.dart';
 import 'package:git_app/app/models/user_model.dart';
-import 'package:git_app/app/services/git_search_service.dart';
+import 'package:git_app/app/services/github/git_search_service.dart';
 
 class GitSearchRemoteDataSourceImpl implements GitSearchRemoteDataSource {
   late final GitSearchService _apiService;

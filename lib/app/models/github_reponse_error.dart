@@ -1,7 +1,7 @@
-class ApiResponseError {
+class GithubResponseError {
   final String message;
   final String documentationUrl;
-  ApiResponseError({
+  GithubResponseError({
     required this.message,
     required this.documentationUrl,
   });
@@ -13,8 +13,8 @@ class ApiResponseError {
     };
   }
 
-  factory ApiResponseError.fromJson(Map<String, dynamic> json) {
-    return ApiResponseError(
+  factory GithubResponseError.fromJson(Map<String, dynamic> json) {
+    return GithubResponseError(
       message: json["message"] ?? "",
       documentationUrl: json["documentation_url"] ?? "",
     );

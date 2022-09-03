@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:git_app/app/errors/exceptions.dart';
-import 'package:git_app/app/models/api_error.dart';
+import 'package:git_app/app/models/github_reponse_error.dart';
 
 class ErrorHandler {
   static Future handleApi(Future Function() request) async {
@@ -16,7 +16,7 @@ class ErrorHandler {
         case DioErrorType.receiveTimeout:
           throw const NoConnectionException();
         case DioErrorType.response:
-          throw _throwExceptionByResponse(dioError.error);
+          throw _throwExceptionByResponse(dioError);
         case DioErrorType.other:
           throw _throwExceptionByError(dioError);
         default:
@@ -41,10 +41,12 @@ class ErrorHandler {
     final response = dioError.response;
     final request = dioError.requestOptions;
     final path = "${request.baseUrl}${request.path}";
-    final error = ApiResponseError.fromJson(response?.data);
+    final error = GithubResponseError.fromJson(response?.data);
 
     switch (response?.statusCode) {
       case 401:
+        throw NoAuthorizedException;
+      case 403:
         throw NoAuthorizedException;
       case 404:
         throw NotFoundException(

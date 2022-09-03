@@ -39,7 +39,10 @@ class HomeCubit extends Cubit<HomeState> {
     _debounce = Timer(
       const Duration(milliseconds: 500),
       () async {
-        if (username.trim().isEmpty) getUsers();
+        if (username.trim().isEmpty) {
+          getUsers();
+          return;
+        }
 
         final eitherUser = await _findUserByUsername.call(
           username: username,

@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:git_app/app/datasources/remote/git_search_remote_data.dart';
 import 'package:git_app/app/errors/exceptions.dart';
 import 'package:git_app/app/errors/failures.dart';
+import 'package:git_app/app/features/home/errors/api_rate_limit_exceeded.dart';
 import 'package:git_app/app/features/home/errors/git_user_not_found.dart';
 import 'package:git_app/app/models/user_model.dart';
 import 'package:git_app/app/repositories/git_search_repository.dart';
@@ -27,6 +28,9 @@ class GitSearchRepositoryImpl implements GitHubSearchRepository {
       if (e is NoConnectionException) {
         return left(NoConnectionFailure());
       }
+      if (e is NoAuthorizedException) {
+        return left(ApiRateLimitExceeded());
+      }
       return left(Failure());
     }
   }
@@ -41,6 +45,9 @@ class GitSearchRepositoryImpl implements GitHubSearchRepository {
     } catch (e) {
       if (e is NotFoundException) {
         return left(GithubUserNotFound(username: username));
+      }
+      if (e is NoAuthorizedException) {
+        return left(ApiRateLimitExceeded());
       }
       if (e is NoConnectionException) {
         return left(NoConnectionFailure());

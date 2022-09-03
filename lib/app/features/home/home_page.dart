@@ -4,17 +4,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:git_app/app/datasources/remote/git_search_remote_data.dart';
 import 'package:git_app/app/datasources/remote/git_search_remote_data_impl.dart';
 import 'package:git_app/app/errors/failures.dart';
+import 'package:git_app/app/extensions/extensions.dart';
 import 'package:git_app/app/features/home/cubit/home_cubit.dart';
 import 'package:git_app/app/features/home/cubit/home_state.dart';
 import 'package:git_app/app/features/home/errors/git_user_not_found.dart';
 import 'package:git_app/app/features/home/widgets/user_item.dart';
 import 'package:git_app/app/repositories/git_search_repository.dart';
 import 'package:git_app/app/repositories/git_search_repository_impl.dart';
-import 'package:git_app/app/services/git_search_service.dart';
-import 'package:git_app/app/services/git_search_service_v1.dart';
+import 'package:git_app/app/services/github/git_search_service.dart';
+import 'package:git_app/app/services/github/git_search_service_v1.dart';
 import 'package:git_app/app/usecases/find_user_by_username.dart';
 import 'package:git_app/app/usecases/get_users.dart';
-import 'package:git_app/app/extensions/extensions.dart';
+import 'package:git_app/app/widgets/failure_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -111,31 +112,32 @@ class _HomePageState extends State<HomePage> {
               child: BlocBuilder<HomeCubit, HomeState>(
                 bloc: _cubit,
                 builder: (_, state) {
+                  FocusManager.instance.primaryFocus?.unfocus();
                   if (state is HomeLoadingState) {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
                   }
-
                   if (state is HomeFailureState) {
-                    final failure = state.failure;
-                    if (failure is NoConnectionFailure) {
+                    if (state.failure is NoConnectionFailure) {
                       return Center(
-                        child: Text(context.l10n.globalNoConnectionError),
+                        child: FailureWidget(
+                          failure: state.failure,
+                          onRetry: () => _cubit.getUsers(),
+                        ),
                       );
                     }
-                    if (failure is GithubUserNotFound) {
+                    if (state.failure is GithubUserNotFound) {
                       return Center(
-                        child: Text(context.l10n.homeGithubUserNotFound),
-                      );
-                    }
-                    if (state.failure is NotFoundFailure) {
-                      return Center(
-                        child: Text(context.l10n.globalResourceNotFound),
+                        child: FailureWidget(
+                          failure: state.failure,
+                          asset: "assets/empty_states/no_results.svg",
+                          message: context.l10n.homeGithubUserNotFound,
+                        ),
                       );
                     }
                     return Center(
-                      child: Text(context.l10n.globalResourceNotFound),
+                      child: FailureWidget(failure: state.failure),
                     );
                   }
                   if (state is HomeEmptyState) {
@@ -143,7 +145,6 @@ class _HomePageState extends State<HomePage> {
                       child: Text(context.l10n.homeEmptyUserList),
                     );
                   }
-
                   if (state is HomeLoadedState) {
                     return ListView.separated(
                       shrinkWrap: true,
